@@ -51,7 +51,7 @@
     <!-- CONTAINER PRINCIPAL -->
     <main class="relative z-10 w-full max-w-6xl w-11/12 my-8 rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.6)] overflow-hidden flex flex-col lg:flex-row border border-white/50 bg-transparent">
         
-        <!-- PARTE ESQUERDA (Efeito Glassmorphism mais transparente e com menos desfoque) -->
+        <!-- PARTE ESQUERDA (Efeito Glassmorphism claro) -->
         <div class="flex-1 p-6 sm:p-10 lg:p-14 flex flex-col justify-center bg-white/40 backdrop-blur-md">
             
             <!-- LOGO -->
@@ -95,7 +95,7 @@
             </ul>
         </div>
 
-        <!-- PARTE DIREITA / BOX DO FORMULÁRIO (Fundo Sólido Branco) -->
+        <!-- PARTE DIREITA / BOX DO FORMULÁRIO -->
         <div class="w-full lg:w-[480px] bg-white p-6 sm:p-10 flex flex-col justify-center relative">
             
             <div class="text-center mb-8">
@@ -217,7 +217,8 @@
                 } else {
                     event.preventDefault(); 
 
-                    const googleSheetUrl = "COLE_AQUI_A_URL_DO_APP_DA_WEB_DO_GOOGLE";
+                    // Seu URL Webhook Atualizado
+                    const googleSheetUrl = "https://script.google.com/macros/s/AKfycbwez_c9Yz3pdafJUH_5j7grZTh9XFg2m60WKwlBj1JaNpku8-TDWzkIvrgxk42zGu-oRQ/exec";
 
                     const formData = {
                         nome: document.getElementById('name').value,
@@ -230,7 +231,7 @@
                     const btnSubmit = form.querySelector('button[type="submit"]');
                     const originalText = btnSubmit.innerHTML;
                     
-                    btnSubmit.innerHTML = "CARREGANDO...";
+                    btnSubmit.innerHTML = "ENVIANDO E-BOOK...";
                     btnSubmit.disabled = true;
 
                     fetch(googleSheetUrl, {
@@ -240,7 +241,7 @@
                     .then(response => response.json())
                     .then(data => {
                         if(data.status === "sucesso") {
-                            alert("E-book enviado! Verifique seu e-mail em alguns instantes.");
+                            alert("E-book enviado! Verifique seu e-mail em instantes.");
                             form.reset(); 
                         } else {
                             alert("Ops, algo deu errado. Tente novamente.");

@@ -42,7 +42,7 @@
 </head>
 <body class="font-sans antialiased text-gray-800 min-h-screen flex items-center justify-center relative bg-gray-900">
 
-    <!-- IMAGEM DE BACKGROUND: Gado Nelore -->
+    <!-- IMAGEM DE BACKGROUND -->
     <div class="fixed inset-0 z-0 bg-cover bg-center bg-no-repeat" style="background-image: url('https://raw.githubusercontent.com/Diversa-Academy/Images/395ecc98e41c38d00d07ac78ee38f24f65bf0a39/rebanho-nelore.png');">
         <!-- Overlay reduzido para revelar mais a imagem original -->
         <div class="absolute inset-0 bg-gray-900/40"></div>
@@ -51,10 +51,9 @@
     <!-- CONTAINER PRINCIPAL -->
     <main class="relative z-10 w-full max-w-6xl w-11/12 my-8 rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.6)] overflow-hidden flex flex-col lg:flex-row border border-white/50 bg-transparent">
         
-        <!-- PARTE ESQUERDA (Efeito Glassmorphism claro) -->
+        <!-- PARTE ESQUERDA (Glassmorphism) -->
         <div class="flex-1 p-6 sm:p-10 lg:p-14 flex flex-col justify-center bg-white/40 backdrop-blur-md">
             
-            <!-- LOGO -->
             <div class="bg-gray-900 py-4 px-6 rounded-2xl inline-block w-max mb-8 shadow-md border border-gray-800">
                 <img src="https://raw.githubusercontent.com/Diversa-Academy/Images/9b0e7afbf329744e155b2d10a22a1a7f56b2be3c/Diversa%20Agro%20Logo.png" alt="Diversa Agro" class="h-16 sm:h-20 w-auto object-contain object-left">
             </div>
@@ -105,6 +104,13 @@
 
             <form id="conversionForm" action="#" method="POST" class="space-y-5" novalidate>
                 
+                <!-- INÍCIO HONEYPOT: Campo invisível para enganar robôs -->
+                <div class="absolute left-[-9999px] top-[-9999px] opacity-0 z-[-1]" aria-hidden="true">
+                    <label for="company_website">Deixe este campo em branco, por favor.</label>
+                    <input type="text" id="company_website" name="company_website" tabindex="-1" autocomplete="off">
+                </div>
+                <!-- FIM HONEYPOT -->
+
                 <div>
                     <label for="name" class="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-1">Nome Completo *</label>
                     <input type="text" id="name" name="name" required placeholder="Ex: João da Silva" 
@@ -217,7 +223,18 @@
                 } else {
                     event.preventDefault(); 
 
-                    // Seu URL Webhook Atualizado
+                    // VERIFICAÇÃO DO HONEYPOT (Defesa Anti-Bot)
+                    const honeypotField = document.getElementById('company_website').value;
+                    if (honeypotField !== "") {
+                        // Se o campo oculto foi preenchido, é um bot.
+                        // Fingimos sucesso para não gerar suspeita no atacante e paramos a função.
+                        console.log("Submissão bloqueada: comportamento de bot detectado.");
+                        alert("E-book enviado! Verifique seu e-mail em instantes.");
+                        form.reset();
+                        return; 
+                    }
+
+                    // Se passou pelo Honeypot, continua normalmente com o envio real
                     const googleSheetUrl = "https://script.google.com/macros/s/AKfycbwez_c9Yz3pdafJUH_5j7grZTh9XFg2m60WKwlBj1JaNpku8-TDWzkIvrgxk42zGu-oRQ/exec";
 
                     const formData = {

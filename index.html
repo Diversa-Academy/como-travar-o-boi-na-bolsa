@@ -134,7 +134,7 @@
                 <div class="pt-2">
                     <label class="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">Você atua no Agro ou investe? *</label>
                     
-                    <div class="grid grid-cols-2 gap-4">
+                    <div id="agroProfileOptions" class="grid grid-cols-2 gap-4">
                         
                         <label class="cursor-pointer relative">
                             <input type="radio" name="agro_profile" value="Sim" class="peer sr-only" required>
@@ -157,6 +157,7 @@
                         </label>
 
                     </div>
+                    <p id="profileError" class="text-red-500 text-xs mt-1.5 hidden font-medium">Selecione uma opção para continuar.</p>
                 </div>
 
                 <div class="pt-4">
@@ -213,20 +214,100 @@
             const phoneError = document.getElementById('phoneError');
             const emailInput = document.getElementById('email');
             const emailError = document.getElementById('emailError');
+            const profileError = document.getElementById('profileError');
+            const agroProfileOptions = document.getElementById('agroProfileOptions');
             const PDF_URL = 'https://drive.google.com/file/d/1Rx6PwSi9OB87sEuOylp9cGGut02lwS2J/preview';
+            const THANK_YOU_URL = './obrigado.html';
 
             phoneInput.addEventListener('input', function (e) {
                 let x = e.target.value.replace(/\D/g, '').match(/(\d{0,2})(\d{0,5})(\d{0,4})/);
                 e.target.value = !x[2] ? x[1] : '(' + x[1] + ') ' + x[2] + (x[3] ? '-' + x[3] : '');
             });
 
+            function setButtonLoading(button, isLoading, originalText) {
+                if (isLoading) {
+                    button.innerHTML = '<span class="w-5 h-5 mr-3 border-2 border-gray-900/30 border-t-gray-900 rounded-full animate-spin"></span><span>ENVIANDO E-BOOK...</span>';
+                    button.disabled = true;
+                    button.classList.add('cursor-wait', 'opacity-90');
+                    return;
+                }
+
+                button.innerHTML = originalText;
+                button.disabled = false;
+                button.classList.remove('cursor-wait', 'opacity-90');
+            }
+
+            function openReservedPdfTab() {
+                const reservedTab = window.open('', '_blank');
+
+                if (reservedTab) {
+                    reservedTab.document.write('<!doctype html><title>Carregando e-book...</title><body style="font-family: Arial, sans-serif; display: flex; align-items: center; justify-content: center; min-height: 100vh; margin: 0; color: #1f2937;">Carregando seu e-book...</body>');
+                    reservedTab.document.close();
+                }
+
+                return reservedTab;
+            }
+
+            function sendToGoogleSheets(googleSheetUrl, formData) {
+                return fetch(googleSheetUrl, {
+                    method: 'POST',
+                    redirect: 'follow',
+                    cache: 'no-store',
+                    body: JSON.stringify(formData)
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status !== 'sucesso') {
+                        throw new Error('Resposta inesperada do Google Apps Script.');
+                    }
+
+                    return data;
+                })
+                .catch(error => {
+                    if (navigator.onLine === false) {
+                        throw error;
+                    }
+
+                    console.warn('Resposta bloqueada pelo navegador, usando fallback sem CORS.', error);
+                    return fetch(googleSheetUrl, {
+                        method: 'POST',
+                        mode: 'no-cors',
+                        cache: 'no-store',
+                        body: JSON.stringify(formData)
+                    }).then(() => ({ status: 'sucesso', fallback: true }));
+                });
+            }
+
+            function goToSuccessPage(reservedTab) {
+                if (reservedTab && !reservedTab.closed) {
+                    reservedTab.location.href = PDF_URL;
+                } else {
+                    window.open(PDF_URL, '_blank');
+                }
+
+                form.reset();
+                setTimeout(() => {
+                    window.location.href = THANK_YOU_URL;
+                }, 500);
+            }
+
+            function closeReservedTab(reservedTab) {
+                if (reservedTab && !reservedTab.closed) {
+                    reservedTab.close();
+                }
+            }
+
             form.addEventListener('submit', function(event) {
+                event.preventDefault();
+
                 let isValid = true;
 
                 phoneError.classList.add('hidden');
                 emailError.classList.add('hidden');
+                profileError.classList.add('hidden');
                 phoneInput.classList.remove('border-red-500', 'ring-red-500', 'bg-red-50');
                 emailInput.classList.remove('border-red-500', 'ring-red-500', 'bg-red-50');
+                agroProfileOptions.classList.remove('rounded-xl', 'ring-2', 'ring-red-500', 'ring-offset-2');
 
                 const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,10}$/;
                 if (!emailRegex.test(emailInput.value)) {
@@ -242,75 +323,54 @@
                     isValid = false;
                 }
 
-                const radios = document.querySelectorAll('input[name="agro_profile"]');
-                let formValidRadio = false;
-                radios.forEach(function(radio) {
-                    if (radio.checked) formValidRadio = true;
-                });
-                if (!formValidRadio) {
+                const selectedProfile = document.querySelector('input[name="agro_profile"]:checked');
+                if (!selectedProfile) {
+                    profileError.classList.remove('hidden');
+                    agroProfileOptions.classList.add('rounded-xl', 'ring-2', 'ring-red-500', 'ring-offset-2');
                     isValid = false;
                 }
 
                 if (!isValid) {
-                    event.preventDefault();
-                } else {
-                    event.preventDefault(); 
+                    return;
+                }
 
-                    // VERIFICAÇÃO DO HONEYPOT (Defesa Anti-Bot)
-                    const honeypotField = document.getElementById('company_website').value;
-                    if (honeypotField !== "") {
-                        // Se o campo oculto foi preenchido, é um bot.
-                        // Fingimos sucesso para não gerar suspeita no atacante e paramos a função.
-                        console.log("Submissão bloqueada: comportamento de bot detectado.");
-                        alert("E-book enviado! Verifique seu e-mail em instantes.");
-                        form.reset();
-                        return; 
-                    }
+                const honeypotField = document.getElementById('company_website').value;
+                if (honeypotField !== '') {
+                    console.log('Submissão bloqueada: comportamento de bot detectado.');
+                    form.reset();
+                    window.location.href = THANK_YOU_URL;
+                    return;
+                }
 
-                    // Se passou pelo Honeypot, continua normalmente com o envio real
-                    const googleSheetUrl = "https://script.google.com/macros/s/AKfycbxUkjih1nxx6bl0Hp86fAM-ReNlLSJ2QeOOXAiOm9ImKoHsVZ01Z_1XaHYyPykM7i3Lfw/exec";
+                const googleSheetUrl = 'https://script.google.com/macros/s/AKfycbxUkjih1nxx6bl0Hp86fAM-ReNlLSJ2QeOOXAiOm9ImKoHsVZ01Z_1XaHYyPykM7i3Lfw/exec';
+                const formData = {
+                    nome: document.getElementById('name').value,
+                    email: document.getElementById('email').value,
+                    telefone: document.getElementById('phone').value,
+                    perfil_agro: selectedProfile.value,
+                    data_hora: new Date().toLocaleString('pt-BR')
+                };
 
-                    const formData = {
-                        nome: document.getElementById('name').value,
-                        email: document.getElementById('email').value,
-                        telefone: document.getElementById('phone').value,
-                        perfil_agro: document.querySelector('input[name="agro_profile"]:checked').value,
-                        data_hora: new Date().toLocaleString("pt-BR") 
-                    };
+                const btnSubmit = form.querySelector('button[type="submit"]');
+                const originalText = btnSubmit.innerHTML;
+                const reservedPdfTab = openReservedPdfTab();
 
-                    const btnSubmit = form.querySelector('button[type="submit"]');
-                    const originalText = btnSubmit.innerHTML;
-                    
-                    btnSubmit.innerHTML = '<span class="w-5 h-5 mr-3 border-2 border-gray-900/30 border-t-gray-900 rounded-full animate-spin"></span><span>ENVIANDO E-BOOK...</span>';
-                    btnSubmit.disabled = true;
+                setButtonLoading(btnSubmit, true, originalText);
 
-                    fetch(googleSheetUrl, {
-                        method: "POST",
-                        body: JSON.stringify(formData)
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        if(data.status === "sucesso") {
-                            window.open(PDF_URL, "_blank");
-                            form.reset();
-                            setTimeout(() => {
-                                window.location.href = "./obrigado.html";
-                            }, 500); 
-                        } else {
-                            alert("Ops, algo deu errado. Tente novamente.");
-                        }
+                sendToGoogleSheets(googleSheetUrl, formData)
+                    .then(() => {
+                        goToSuccessPage(reservedPdfTab);
                     })
                     .catch(error => {
-                        console.error("Erro:", error);
-                        alert("Verifique sua conexão com a internet e tente novamente.");
+                        console.error('Erro:', error);
+                        closeReservedTab(reservedPdfTab);
+                        alert('Verifique sua conexão com a internet e tente novamente.');
                     })
                     .finally(() => {
-                        btnSubmit.innerHTML = originalText;
-                        if (window.location.pathname.indexOf('obrigado.html') === -1) {
-                            btnSubmit.disabled = false;
+                        if (!window.location.pathname.endsWith('/obrigado.html')) {
+                            setButtonLoading(btnSubmit, false, originalText);
                         }
                     });
-                }
             });
         });
     </script>

@@ -1,6 +1,19 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
+    <script>
+!function(f,b,e,v,n,t,s)
+{if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+n.queue=[];t=b.createElement(e);t.async=!0;
+t.src=v;s=b.getElementsByTagName(e)[0];
+s.parentNode.insertBefore(t,s)}(window, document,'script',
+'https://connect.facebook.net/en_US/fbevents.js');
+fbq('init', '1464892971511881');
+fbq('track', 'PageView');
+</script>
+    
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0">
@@ -113,20 +126,20 @@
 
                 <div>
                     <label for="name" class="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-1">Nome Completo *</label>
-                    <input type="text" id="name" name="name" required placeholder="Ex: João da Silva" 
+                    <input type="text" id="name" name="name" autocomplete="name" required placeholder="Ex: João da Silva" 
                            class="block w-full px-4 h-14 bg-gray-50 border border-gray-300 rounded-xl focus:bg-white focus:ring-2 focus:ring-agro-primary focus:border-agro-primary sm:text-base transition-all outline-none text-gray-900 placeholder-gray-400">
                 </div>
 
                 <div>
                     <label for="email" class="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-1">E-mail Principal *</label>
-                    <input type="email" id="email" name="email" required pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$" placeholder="seu@email.com" 
+                    <input type="email" id="email" name="email" autocomplete="email" inputmode="email" required pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$" placeholder="seu@email.com" 
                            class="block w-full px-4 h-14 bg-gray-50 border border-gray-300 rounded-xl focus:bg-white focus:ring-2 focus:ring-agro-primary focus:border-agro-primary sm:text-base transition-all outline-none text-gray-900 placeholder-gray-400">
                     <p id="emailError" class="text-red-500 text-xs mt-1.5 hidden font-medium">Ops! Insira um e-mail válido no formato nome@site.com.</p>
                 </div>
 
                 <div>
                     <label for="phone" class="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-1">WhatsApp (com DDD) *</label>
-                    <input type="tel" id="phone" name="phone" required placeholder="(00) 00000-0000" maxlength="15"
+                    <input type="tel" id="phone" name="phone" autocomplete="tel" inputmode="tel" required placeholder="(00) 00000-0000" maxlength="15"
                            class="block w-full px-4 h-14 bg-gray-50 border border-gray-300 rounded-xl focus:bg-white focus:ring-2 focus:ring-agro-primary focus:border-agro-primary sm:text-base transition-all outline-none text-gray-900 placeholder-gray-400">
                     <p id="phoneError" class="text-red-500 text-xs mt-1.5 hidden font-medium">Verifique o número inserido. Não esqueça do DDD.</p>
                 </div>
@@ -236,6 +249,7 @@
 <script>
         document.addEventListener("DOMContentLoaded", function() {
             const form = document.getElementById('conversionForm');
+            const nameInput = document.getElementById('name');
             const phoneInput = document.getElementById('phone');
             const phoneError = document.getElementById('phoneError');
             const emailInput = document.getElementById('email');
@@ -247,9 +261,32 @@
             const backToLanding = document.getElementById('backToLanding');
             const PDF_URL = 'https://drive.google.com/file/d/1Rx6PwSi9OB87sEuOylp9cGGut02lwS2J/preview';
 
+            function normalizePhoneNumber(value) {
+                let digits = String(value || '').replace(/\D/g, '');
+
+                if (digits.length === 12 && digits.startsWith('55')) {
+                    digits = digits.slice(2);
+                }
+
+                if (digits.length === 13 && digits.startsWith('55')) {
+                    digits = digits.slice(2);
+                }
+
+                return digits;
+            }
+
+            function formatBrazilianPhone(digits) {
+                const phoneDigits = normalizePhoneNumber(digits).slice(0, 11);
+                const x = phoneDigits.match(/(\d{0,2})(\d{0,5})(\d{0,4})/);
+                return !x[2] ? x[1] : '(' + x[1] + ') ' + x[2] + (x[3] ? '-' + x[3] : '');
+            }
+
             phoneInput.addEventListener('input', function (e) {
-                let x = e.target.value.replace(/\D/g, '').match(/(\d{0,2})(\d{0,5})(\d{0,4})/);
-                e.target.value = !x[2] ? x[1] : '(' + x[1] + ') ' + x[2] + (x[3] ? '-' + x[3] : '');
+                e.target.value = formatBrazilianPhone(e.target.value);
+            });
+
+            phoneInput.addEventListener('change', function (e) {
+                e.target.value = formatBrazilianPhone(e.target.value);
             });
 
             if (backToLanding) {
@@ -354,15 +391,23 @@
                 emailInput.classList.remove('border-red-500', 'ring-red-500', 'bg-red-50');
                 agroProfileOptions.classList.remove('rounded-xl', 'ring-2', 'ring-red-500', 'ring-offset-2');
 
+                const normalizedName = nameInput.value.trim();
+                const normalizedEmail = emailInput.value.trim().toLowerCase();
+                const normalizedPhoneDigits = normalizePhoneNumber(phoneInput.value);
+                const normalizedPhone = formatBrazilianPhone(normalizedPhoneDigits);
+
+                nameInput.value = normalizedName;
+                emailInput.value = normalizedEmail;
+                phoneInput.value = normalizedPhone;
+
                 const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,10}$/;
-                if (!emailRegex.test(emailInput.value)) {
+                if (!emailRegex.test(normalizedEmail)) {
                     emailError.classList.remove('hidden');
                     emailInput.classList.add('border-red-500', 'ring-red-500', 'bg-red-50');
                     isValid = false;
                 }
 
-                const phoneNumbersOnly = phoneInput.value.replace(/\D/g, '');
-                if (phoneNumbersOnly.length < 10 || phoneNumbersOnly.length > 11) {
+                if (normalizedPhoneDigits.length < 10 || normalizedPhoneDigits.length > 11) {
                     phoneError.classList.remove('hidden');
                     phoneInput.classList.add('border-red-500', 'ring-red-500', 'bg-red-50');
                     isValid = false;
@@ -389,9 +434,9 @@
 
                 const googleSheetUrl = 'https://script.google.com/macros/s/AKfycbxUkjih1nxx6bl0Hp86fAM-ReNlLSJ2QeOOXAiOm9ImKoHsVZ01Z_1XaHYyPykM7i3Lfw/exec';
                 const formData = {
-                    nome: document.getElementById('name').value,
-                    email: document.getElementById('email').value,
-                    telefone: document.getElementById('phone').value,
+                    nome: normalizedName,
+                    email: normalizedEmail,
+                    telefone: normalizedPhone,
                     perfil_agro: selectedProfile.value,
                     data_hora: new Date().toLocaleString('pt-BR')
                 };

@@ -206,7 +206,7 @@
             </div>
         </div>
     </main>
-    <!-- PÁGINA DE OBRIGADO INLINE: evita 404 no GitHub Pages após conversão -->
+    <!-- PÁGINA DE OBRIGADO INLINE -->
     <main id="thankYouPage" class="hidden relative z-10 w-full max-w-3xl w-11/12 my-8 rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.6)] overflow-hidden border border-white/50 bg-white/40 backdrop-blur-md">
         <section class="p-6 sm:p-10 lg:p-14 text-center">
             <div class="bg-gray-900 py-4 px-6 rounded-2xl inline-block mb-8 shadow-md border border-gray-800">
@@ -223,17 +223,17 @@
 
             <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
                 <a href="https://drive.google.com/file/d/1Rx6PwSi9OB87sEuOylp9cGGut02lwS2J/preview" target="_blank" rel="noopener" class="inline-flex items-center justify-center h-14 px-8 rounded-xl shadow-lg text-base font-heading font-extrabold text-gray-900 bg-cta hover:bg-cta-hover focus:outline-none focus:ring-4 focus:ring-cta/30 transition-all transform hover:-translate-y-1 active:translate-y-0 active:shadow-md">
-                    Acessar e-book
+                    Abrir e-book
                     <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
                 </a>
 
-                <a href="./ebooktravarboi.html" class="inline-flex items-center justify-center h-14 px-8 rounded-xl text-base font-heading font-extrabold text-gray-900 bg-white/80 hover:bg-white focus:outline-none focus:ring-4 focus:ring-white/40 transition-all">
+                <button type="button" id="backToLanding" class="inline-flex items-center justify-center h-14 px-8 rounded-xl text-base font-heading font-extrabold text-gray-900 bg-white/80 hover:bg-white focus:outline-none focus:ring-4 focus:ring-white/40 transition-all">
                     Voltar ao site
-                </a>
+                </button>
             </div>
         </section>
     </main>
-    <script>
+<script>
         document.addEventListener("DOMContentLoaded", function() {
             const form = document.getElementById('conversionForm');
             const phoneInput = document.getElementById('phone');
@@ -244,21 +244,22 @@
             const agroProfileOptions = document.getElementById('agroProfileOptions');
             const landingPage = document.querySelector('main:not(#thankYouPage)');
             const thankYouPage = document.getElementById('thankYouPage');
-            const THANK_YOU_URL = new URL(window.location.href);
-            THANK_YOU_URL.search = '?obrigado=1';
-            THANK_YOU_URL.hash = '';
-
-            if (new URLSearchParams(window.location.search).get('obrigado') === '1') {
-                if (landingPage) landingPage.classList.add('hidden');
-                if (thankYouPage) thankYouPage.classList.remove('hidden');
-                document.title = 'Obrigado! | Diversa Agro';
-                return;
-            }
+            const backToLanding = document.getElementById('backToLanding');
+            const PDF_URL = 'https://drive.google.com/file/d/1Rx6PwSi9OB87sEuOylp9cGGut02lwS2J/preview';
 
             phoneInput.addEventListener('input', function (e) {
                 let x = e.target.value.replace(/\D/g, '').match(/(\d{0,2})(\d{0,5})(\d{0,4})/);
                 e.target.value = !x[2] ? x[1] : '(' + x[1] + ') ' + x[2] + (x[3] ? '-' + x[3] : '');
             });
+
+            if (backToLanding) {
+                backToLanding.addEventListener('click', function() {
+                    if (thankYouPage) thankYouPage.classList.add('hidden');
+                    if (landingPage) landingPage.classList.remove('hidden');
+                    document.title = 'E-book Definitivo: Como Travar o Boi na Bolsa';
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                });
+            }
 
             function setButtonLoading(button, isLoading, originalText) {
                 if (isLoading) {
@@ -271,6 +272,32 @@
                 button.innerHTML = originalText;
                 button.disabled = false;
                 button.classList.remove('cursor-wait', 'opacity-90');
+            }
+
+            function reserveEbookTab() {
+                const ebookTab = window.open('', '_blank');
+
+                if (ebookTab) {
+                    ebookTab.document.write('<!doctype html><title>Carregando e-book...</title><body style="font-family: Arial, sans-serif; display: flex; align-items: center; justify-content: center; min-height: 100vh; margin: 0; color: #1f2937;">Aguarde. Estamos liberando seu e-book...</body>');
+                    ebookTab.document.close();
+                }
+
+                return ebookTab;
+            }
+
+            function openEbook(ebookTab) {
+                if (ebookTab && !ebookTab.closed) {
+                    ebookTab.location.href = PDF_URL;
+                    return;
+                }
+
+                window.open(PDF_URL, '_blank', 'noopener');
+            }
+
+            function closeEbookTab(ebookTab) {
+                if (ebookTab && !ebookTab.closed) {
+                    ebookTab.close();
+                }
             }
 
             function wait(ms) {
@@ -308,11 +335,11 @@
                 });
             }
 
-            function goToSuccessPage() {
-                form.reset();
-                setTimeout(() => {
-                    window.location.href = THANK_YOU_URL.toString();
-                }, 500);
+            function showThankYou() {
+                if (landingPage) landingPage.classList.add('hidden');
+                if (thankYouPage) thankYouPage.classList.remove('hidden');
+                document.title = 'Obrigado! | Diversa Agro';
+                window.scrollTo({ top: 0, behavior: 'smooth' });
             }
 
             form.addEventListener('submit', function(event) {
@@ -356,7 +383,7 @@
                 if (honeypotField !== '') {
                     console.log('Submissão bloqueada: comportamento de bot detectado.');
                     form.reset();
-                    window.location.href = THANK_YOU_URL.toString();
+                    showThankYou();
                     return;
                 }
 
@@ -371,19 +398,23 @@
 
                 const btnSubmit = form.querySelector('button[type="submit"]');
                 const originalText = btnSubmit.innerHTML;
+                const ebookTab = reserveEbookTab();
 
                 setButtonLoading(btnSubmit, true, originalText);
 
                 sendToGoogleSheets(googleSheetUrl, formData)
-                    .then(goToSuccessPage)
+                    .then(() => {
+                        openEbook(ebookTab);
+                        form.reset();
+                        showThankYou();
+                    })
                     .catch(error => {
                         console.error('Erro:', error);
+                        closeEbookTab(ebookTab);
                         alert('Verifique sua conexão com a internet e tente novamente.');
                     })
                     .finally(() => {
-                        if (new URLSearchParams(window.location.search).get('obrigado') !== '1') {
-                            setButtonLoading(btnSubmit, false, originalText);
-                        }
+                        setButtonLoading(btnSubmit, false, originalText);
                     });
             });
         });

@@ -52,13 +52,13 @@
     <main class="relative z-10 w-full max-w-6xl w-11/12 my-8 rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.6)] overflow-hidden flex flex-col lg:flex-row border border-white/50 bg-transparent">
         
         <!-- PARTE ESQUERDA (Glassmorphism) -->
-        <div class="flex-1 p-6 sm:p-10 lg:p-14 flex flex-col justify-center bg-white/40 backdrop-blur-md">
+        <div class="order-1 lg:order-1 flex-1 p-6 sm:p-10 lg:p-14 flex flex-col justify-center bg-white/40 backdrop-blur-md">
             
             <div class="bg-gray-900 py-4 px-6 rounded-2xl inline-block w-max mb-8 shadow-md border border-gray-800">
                 <img src="https://raw.githubusercontent.com/Diversa-Academy/Images/9b0e7afbf329744e155b2d10a22a1a7f56b2be3c/Diversa%20Agro%20Logo.png" alt="Diversa Agro" class="h-16 sm:h-20 w-auto object-contain object-left">
             </div>
 
-            <div class="inline-flex items-center font-bold text-agro-primary bg-agro-light px-4 py-2 rounded-full w-max shadow-sm border border-green-200 mb-6 text-xs sm:text-sm tracking-wide uppercase">
+            <div class="hidden lg:inline-flex items-center font-bold text-agro-primary bg-agro-light px-4 py-2 rounded-full w-max shadow-sm border border-green-200 mb-6 text-xs sm:text-sm tracking-wide uppercase">
                 <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
                 Material 100% Gratuito
             </div>
@@ -68,11 +68,11 @@
                 <span class="text-agro-primary">Preço do Boi</span> na Bolsa
             </h1>
             
-            <p class="text-base sm:text-lg text-gray-800 mb-8 font-medium leading-relaxed max-w-lg">
+            <p class="hidden lg:block text-base sm:text-lg text-gray-800 mb-8 font-medium leading-relaxed max-w-lg">
                 O manual prático para pecuaristas que desejam proteger sua margem de lucro contra as quedas do mercado físico utilizando estratégias na B3.
             </p>
             
-            <ul class="space-y-5 mb-8 text-gray-900 font-bold">
+            <ul class="hidden lg:block space-y-5 mb-8 text-gray-900 font-bold">
                 <li class="flex items-start">
                     <span class="flex-shrink-0 w-8 h-8 flex items-center justify-center rounded-full bg-agro-primary/20 text-agro-primary mr-4 mt-0.5 shadow-sm">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
@@ -95,7 +95,7 @@
         </div>
 
         <!-- PARTE DIREITA / BOX DO FORMULÁRIO -->
-        <div class="w-full lg:w-[480px] bg-white p-6 sm:p-10 flex flex-col justify-center relative">
+        <div class="order-2 lg:order-2 w-full lg:w-[480px] bg-white p-6 sm:p-10 flex flex-col justify-center relative">
             
             <div class="text-center mb-8">
                 <h2 class="font-heading text-2xl sm:text-3xl font-bold text-gray-900 mb-2">Baixe o E-book</h2>
@@ -172,6 +172,38 @@
                 Não enviamos SPAM. Seus dados estão criptografados e seguros.
             </div>
         </div>
+        <!-- BENEFICIOS MOBILE -->
+        <div class="order-3 lg:hidden p-6 sm:p-10 bg-white/40 backdrop-blur-md">
+            <ul class="space-y-5 text-gray-900 font-bold">
+                <li class="flex items-start">
+                    <span class="flex-shrink-0 w-8 h-8 flex items-center justify-center rounded-full bg-agro-primary/20 text-agro-primary mr-4 mt-0.5 shadow-sm">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                    </span>
+                    <span class="text-sm sm:text-base drop-shadow-sm">Passo a passo simplificado para usar contratos futuros.</span>
+                </li>
+                <li class="flex items-start">
+                    <span class="flex-shrink-0 w-8 h-8 flex items-center justify-center rounded-full bg-agro-primary/20 text-agro-primary mr-4 mt-0.5 shadow-sm">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                    </span>
+                    <span class="text-sm sm:text-base drop-shadow-sm">Como calcular e garantir a margem de lucro por arroba.</span>
+                </li>
+                <li class="flex items-start">
+                    <span class="flex-shrink-0 w-8 h-8 flex items-center justify-center rounded-full bg-agro-primary/20 text-agro-primary mr-4 mt-0.5 shadow-sm">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                    </span>
+                    <span class="text-sm sm:text-base drop-shadow-sm">Livre-se da imprevisibilidade dos frigoríficos.</span>
+                </li>
+            </ul>
+                    <div class="pt-8">
+                <div class="inline-flex items-center font-bold text-agro-primary bg-agro-light px-4 py-2 rounded-full w-max shadow-sm border border-green-200 mb-6 text-xs sm:text-sm tracking-wide uppercase">
+                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+                    Material 100% Gratuito
+                </div>
+                <p class="text-base sm:text-lg text-gray-800 font-medium leading-relaxed max-w-lg">
+                    O manual prático para pecuaristas que desejam proteger sua margem de lucro contra as quedas do mercado físico utilizando estratégias na B3.
+                </p>
+            </div>
+        </div>
     </main>
 
     <script>
@@ -181,6 +213,7 @@
             const phoneError = document.getElementById('phoneError');
             const emailInput = document.getElementById('email');
             const emailError = document.getElementById('emailError');
+            const PDF_URL = 'https://drive.google.com/file/d/1Rx6PwSi9OB87sEuOylp9cGGut02lwS2J/preview';
 
             phoneInput.addEventListener('input', function (e) {
                 let x = e.target.value.replace(/\D/g, '').match(/(\d{0,2})(\d{0,5})(\d{0,4})/);
@@ -248,7 +281,7 @@
                     const btnSubmit = form.querySelector('button[type="submit"]');
                     const originalText = btnSubmit.innerHTML;
                     
-                    btnSubmit.innerHTML = "ENVIANDO E-BOOK...";
+                    btnSubmit.innerHTML = '<span class="w-5 h-5 mr-3 border-2 border-gray-900/30 border-t-gray-900 rounded-full animate-spin"></span><span>ENVIANDO E-BOOK...</span>';
                     btnSubmit.disabled = true;
 
                     fetch(googleSheetUrl, {
@@ -258,8 +291,11 @@
                     .then(response => response.json())
                     .then(data => {
                         if(data.status === "sucesso") {
-                            alert("E-book enviado! Verifique seu e-mail em instantes.");
-                            form.reset(); 
+                            window.open(PDF_URL, "_blank");
+                            form.reset();
+                            setTimeout(() => {
+                                window.location.href = "./obrigado.html";
+                            }, 500); 
                         } else {
                             alert("Ops, algo deu errado. Tente novamente.");
                         }
@@ -270,7 +306,9 @@
                     })
                     .finally(() => {
                         btnSubmit.innerHTML = originalText;
-                        btnSubmit.disabled = false;
+                        if (window.location.pathname.indexOf('obrigado.html') === -1) {
+                            btnSubmit.disabled = false;
+                        }
                     });
                 }
             });

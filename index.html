@@ -206,7 +206,33 @@
             </div>
         </div>
     </main>
+    <!-- PÁGINA DE OBRIGADO INLINE: evita 404 no GitHub Pages após conversão -->
+    <main id="thankYouPage" class="hidden relative z-10 w-full max-w-3xl w-11/12 my-8 rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.6)] overflow-hidden border border-white/50 bg-white/40 backdrop-blur-md">
+        <section class="p-6 sm:p-10 lg:p-14 text-center">
+            <div class="bg-gray-900 py-4 px-6 rounded-2xl inline-block mb-8 shadow-md border border-gray-800">
+                <img src="https://raw.githubusercontent.com/Diversa-Academy/Images/9b0e7afbf329744e155b2d10a22a1a7f56b2be3c/Diversa%20Agro%20Logo.png" alt="Diversa Agro" class="h-16 sm:h-20 w-auto object-contain">
+            </div>
 
+            <div class="inline-flex items-center font-bold text-agro-primary bg-agro-light px-4 py-2 rounded-full shadow-sm border border-green-200 mb-6 text-xs sm:text-sm tracking-wide uppercase">
+                Material enviado
+            </div>
+
+            <h1 class="font-heading text-4xl sm:text-5xl font-extrabold text-gray-900 leading-tight mb-4 tracking-tight">Obrigado!</h1>
+            <p class="text-lg sm:text-xl text-gray-800 mb-4 font-semibold leading-relaxed max-w-2xl mx-auto">Seu e-book foi enviado com sucesso para o e-mail informado.</p>
+            <p class="text-sm sm:text-base text-gray-700 mb-8 font-medium leading-relaxed max-w-2xl mx-auto">Se não encontrar o material, verifique também as caixas de Spam, Promoções ou Lixo Eletrônico.</p>
+
+            <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
+                <a href="https://drive.google.com/file/d/1Rx6PwSi9OB87sEuOylp9cGGut02lwS2J/preview" target="_blank" rel="noopener" class="inline-flex items-center justify-center h-14 px-8 rounded-xl shadow-lg text-base font-heading font-extrabold text-gray-900 bg-cta hover:bg-cta-hover focus:outline-none focus:ring-4 focus:ring-cta/30 transition-all transform hover:-translate-y-1 active:translate-y-0 active:shadow-md">
+                    Acessar e-book
+                    <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+                </a>
+
+                <a href="./ebooktravarboi.html" class="inline-flex items-center justify-center h-14 px-8 rounded-xl text-base font-heading font-extrabold text-gray-900 bg-white/80 hover:bg-white focus:outline-none focus:ring-4 focus:ring-white/40 transition-all">
+                    Voltar ao site
+                </a>
+            </div>
+        </section>
+    </main>
     <script>
         document.addEventListener("DOMContentLoaded", function() {
             const form = document.getElementById('conversionForm');
@@ -216,8 +242,18 @@
             const emailError = document.getElementById('emailError');
             const profileError = document.getElementById('profileError');
             const agroProfileOptions = document.getElementById('agroProfileOptions');
-            const PDF_URL = 'https://drive.google.com/file/d/1Rx6PwSi9OB87sEuOylp9cGGut02lwS2J/preview';
-            const THANK_YOU_URL = './obrigado.html';
+            const landingPage = document.querySelector('main:not(#thankYouPage)');
+            const thankYouPage = document.getElementById('thankYouPage');
+            const THANK_YOU_URL = new URL(window.location.href);
+            THANK_YOU_URL.search = '?obrigado=1';
+            THANK_YOU_URL.hash = '';
+
+            if (new URLSearchParams(window.location.search).get('obrigado') === '1') {
+                if (landingPage) landingPage.classList.add('hidden');
+                if (thankYouPage) thankYouPage.classList.remove('hidden');
+                document.title = 'Obrigado! | Diversa Agro';
+                return;
+            }
 
             phoneInput.addEventListener('input', function (e) {
                 let x = e.target.value.replace(/\D/g, '').match(/(\d{0,2})(\d{0,5})(\d{0,4})/);
@@ -237,15 +273,8 @@
                 button.classList.remove('cursor-wait', 'opacity-90');
             }
 
-            function openReservedPdfTab() {
-                const reservedTab = window.open('', '_blank');
-
-                if (reservedTab) {
-                    reservedTab.document.write('<!doctype html><title>Carregando e-book...</title><body style="font-family: Arial, sans-serif; display: flex; align-items: center; justify-content: center; min-height: 100vh; margin: 0; color: #1f2937;">Carregando seu e-book...</body>');
-                    reservedTab.document.close();
-                }
-
-                return reservedTab;
+            function wait(ms) {
+                return new Promise(resolve => setTimeout(resolve, ms));
             }
 
             function sendToGoogleSheets(googleSheetUrl, formData) {
@@ -268,33 +297,22 @@
                         throw error;
                     }
 
-                    console.warn('Resposta bloqueada pelo navegador, usando fallback sem CORS.', error);
+                    console.warn('Resposta bloqueada pelo navegador, tentando envio compatível sem CORS.', error);
                     return fetch(googleSheetUrl, {
                         method: 'POST',
                         mode: 'no-cors',
                         cache: 'no-store',
+                        keepalive: true,
                         body: JSON.stringify(formData)
-                    }).then(() => ({ status: 'sucesso', fallback: true }));
+                    }).then(() => wait(1500)).then(() => ({ status: 'sucesso', fallback: true }));
                 });
             }
 
-            function goToSuccessPage(reservedTab) {
-                if (reservedTab && !reservedTab.closed) {
-                    reservedTab.location.href = PDF_URL;
-                } else {
-                    window.open(PDF_URL, '_blank');
-                }
-
+            function goToSuccessPage() {
                 form.reset();
                 setTimeout(() => {
-                    window.location.href = THANK_YOU_URL;
+                    window.location.href = THANK_YOU_URL.toString();
                 }, 500);
-            }
-
-            function closeReservedTab(reservedTab) {
-                if (reservedTab && !reservedTab.closed) {
-                    reservedTab.close();
-                }
             }
 
             form.addEventListener('submit', function(event) {
@@ -338,7 +356,7 @@
                 if (honeypotField !== '') {
                     console.log('Submissão bloqueada: comportamento de bot detectado.');
                     form.reset();
-                    window.location.href = THANK_YOU_URL;
+                    window.location.href = THANK_YOU_URL.toString();
                     return;
                 }
 
@@ -353,21 +371,17 @@
 
                 const btnSubmit = form.querySelector('button[type="submit"]');
                 const originalText = btnSubmit.innerHTML;
-                const reservedPdfTab = openReservedPdfTab();
 
                 setButtonLoading(btnSubmit, true, originalText);
 
                 sendToGoogleSheets(googleSheetUrl, formData)
-                    .then(() => {
-                        goToSuccessPage(reservedPdfTab);
-                    })
+                    .then(goToSuccessPage)
                     .catch(error => {
                         console.error('Erro:', error);
-                        closeReservedTab(reservedPdfTab);
                         alert('Verifique sua conexão com a internet e tente novamente.');
                     })
                     .finally(() => {
-                        if (!window.location.pathname.endsWith('/obrigado.html')) {
+                        if (new URLSearchParams(window.location.search).get('obrigado') !== '1') {
                             setButtonLoading(btnSubmit, false, originalText);
                         }
                     });

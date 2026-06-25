@@ -30,7 +30,6 @@ fbq('track', 'PageView');
     <title>E-book Definitivo: Como Travar o Boi na Bolsa</title>
     <meta name="description" content="Baixe gratuitamente o e-book e descubra como travar o preço do boi na bolsa de valores. Proteja seu lucro.">
     
-    <!-- Favicon Diversa Agro -->
     <link rel="icon" type="image/png" href="https://raw.githubusercontent.com/Diversa-Academy/Images/9b0e7afbf329744e155b2d10a22a1a7f56b2be3c/Diversa%20Agro%20Icon.png">
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -64,16 +63,12 @@ fbq('track', 'PageView');
 </head>
 <body class="font-sans antialiased text-gray-800 min-h-screen flex items-center justify-center relative bg-gray-900">
 
-    <!-- IMAGEM DE BACKGROUND -->
     <div class="fixed inset-0 z-0 bg-cover bg-center bg-no-repeat" style="background-image: url('https://raw.githubusercontent.com/Diversa-Academy/Images/395ecc98e41c38d00d07ac78ee38f24f65bf0a39/rebanho-nelore.png');">
-        <!-- Overlay reduzido para revelar mais a imagem original -->
         <div class="absolute inset-0 bg-gray-900/40"></div>
     </div>
 
-    <!-- CONTAINER PRINCIPAL -->
     <main class="relative z-10 w-full max-w-6xl w-11/12 my-8 rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.6)] overflow-hidden flex flex-col lg:flex-row border border-white/50 bg-transparent">
         
-        <!-- PARTE ESQUERDA (Glassmorphism) -->
         <div class="order-1 lg:order-1 flex-1 p-6 sm:p-10 lg:p-14 flex flex-col justify-center bg-white/40 backdrop-blur-md">
             
             <div class="bg-gray-900 py-4 px-6 rounded-2xl inline-block w-max mb-8 shadow-md border border-gray-800">
@@ -116,7 +111,6 @@ fbq('track', 'PageView');
             </ul>
         </div>
 
-        <!-- PARTE DIREITA / BOX DO FORMULÁRIO -->
         <div class="order-2 lg:order-2 w-full lg:w-[480px] bg-white p-6 sm:p-10 flex flex-col justify-center relative">
             
             <div class="text-center mb-8">
@@ -126,13 +120,10 @@ fbq('track', 'PageView');
 
             <form id="conversionForm" action="#" method="POST" class="space-y-5" novalidate>
                 
-                <!-- INÍCIO HONEYPOT: Campo invisível para enganar robôs -->
                 <div class="absolute left-[-9999px] top-[-9999px] opacity-0 z-[-1]" aria-hidden="true">
-                    <label for="company_website">Deixe este campo em branco, por favor.</label>
-                    <input type="text" id="company_website" name="company_website" tabindex="-1" autocomplete="off">
+                    <label for="campo_armadilha">Deixe este campo em branco, por favor.</label>
+                    <input type="text" id="campo_armadilha" name="campo_armadilha" tabindex="-1" autocomplete="new-password">
                 </div>
-                <!-- FIM HONEYPOT -->
-
                 <div>
                     <label for="name" class="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-1">Nome Completo *</label>
                     <input type="text" id="name" name="name" autocomplete="name" required placeholder="Ex: João da Silva" 
@@ -195,7 +186,6 @@ fbq('track', 'PageView');
                 Não enviamos SPAM. Seus dados estão criptografados e seguros.
             </div>
         </div>
-        <!-- BENEFICIOS MOBILE -->
         <div class="order-3 lg:hidden p-6 sm:p-10 bg-white/40 backdrop-blur-md">
             <ul class="space-y-5 text-gray-900 font-bold">
                 <li class="flex items-start">
@@ -228,7 +218,6 @@ fbq('track', 'PageView');
             </div>
         </div>
     </main>
-    <!-- PÁGINA DE OBRIGADO INLINE -->
     <main id="thankYouPage" class="hidden relative z-10 w-full max-w-3xl w-11/12 my-8 rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.6)] overflow-hidden border border-white/50 bg-white/40 backdrop-blur-md">
         <section class="p-6 sm:p-10 lg:p-14 text-center">
             <div class="bg-gray-900 py-4 px-6 rounded-2xl inline-block mb-8 shadow-md border border-gray-800">
@@ -433,7 +422,7 @@ fbq('track', 'PageView');
                     return;
                 }
 
-                const honeypotField = document.getElementById('company_website').value;
+                const honeypotField = document.getElementById('campo_armadilha').value;
                 if (honeypotField !== '') {
                     console.log('Submissão bloqueada: comportamento de bot detectado.');
                     form.reset();
